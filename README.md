@@ -8,6 +8,9 @@ This repository is a Lean 4 formalization, with Mathlib `v4.28.0`, of Erdős Pro
 - This branch, `analytic-route`, adds an analytic argument for forests with at least 61 vertices. With it, the full
   statement is proved with no hypotheses; see "The whole theorem" below.
 
+`WHAT_WE_DID.md` explains in plain terms what was done and by whom. `docs/ANALYTIC_PROOF.md` gives the mathematics of
+the argument for forests with at least 61 vertices.
+
 ## The finite part: forests with at most 60 vertices
 
 ```lean
