@@ -53,6 +53,41 @@ Proposition 1.2:
   - `Zhang.forest_unimodal_of_card_le_sixty_kernel` is the 60-vertex theorem on `propext`, `Classical.choice` and
     `Quot.sound` alone (`Erdos993Lean/ZhangKernel/Audit.lean` prints the axioms).
 
+## The analytic route: forests with at least 61 vertices (branch `analytic-route`)
+
+This branch adds a Lean formalization of an analytic argument for large forests, built on T. Zhang's conditional
+binomial mixture over a maximum-weight independent set. Everything is proved in Lean except the two hypotheses of the
+top theorem:
+
+```lean
+theorem Erdos993Lean.Analytic.State.erdos993_of_upperBox_O2
+    (hU : Erdos993Lean.Analytic.Reserve.UpperBoxOK)
+    (h2 : Erdos993Lean.Analytic.VarianceRatioBound Erdos993Lean.Analytic.Profile30.P) :
+    Erdos993Statement
+```
+
+(`Erdos993Lean/Analytic/State.lean`).
+
+- **Proved in Lean**, together with the kernel-checked finite part above:
+  - the reduction to excluding weak valleys at interior ranks of an activity window [1/3, 7/3];
+  - the mixture identities;
+  - an explicit no-valley lemma;
+  - a large-mean Fourier theorem;
+  - a small-mean atlas of dual certificates;
+  - the lower tail of the free count;
+  - density floors;
+  - the variance of the free count (input O1) on all five activity bands, except the finite box of the top band.
+- **`UpperBoxOK`**: the finite box of the top band's O1 certificate (617,294 cells). It is proved on paper and
+  independently replayed; its Lean checker is in progress.
+- **`VarianceRatioBound Profile30.P`** (input O2), the variance-ratio bound: in progress.
+
+Trust: standard axioms, plus `Lean.ofReduceBool` and `Lean.trustCompiler` through 94 `native_decide` certificate
+checks. Their soundness is proved in Lean on standard axioms: 30 for the tail cells, 60 for the atlas and 4 for O1's
+lower bands.
+
+Build: `lake build Erdos993LeanAnalyticState`, which also builds the certificate libraries it needs. Build the check
+modules one at a time if memory is tight.
+
 ## Build
 
 ```sh

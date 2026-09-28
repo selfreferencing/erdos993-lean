@@ -36,3 +36,82 @@ roots = ["Erdos993Lean.ZhangCert.Main", "Erdos993Lean.ZhangCert.Final"]
 name = "Erdos993LeanZhangKernel"
 roots = ["Erdos993Lean.ZhangKernel.Main"]
 globs = ["Erdos993Lean.ZhangKernel.+"]
+
+
+# ---- The analytic route for forests with at least 61 vertices (optional libraries) ----
+
+[[lean_lib]]
+name = "Erdos993LeanAnalytic"
+roots = ["Erdos993Lean.Analytic.Defs", "Erdos993Lean.Ceiling.ValleyFree",
+  "Erdos993Lean.Analytic.Window", "Erdos993Lean.Analytic.Translate",
+  "Erdos993Lean.Analytic.Top", "Erdos993Lean.Analytic.Consistency",
+  "Erdos993Lean.Analytic.HardCore.Mixture", "Erdos993Lean.Analytic.HardCore.Weight",
+  "Erdos993Lean.Analytic.HardCore.Laplace", "Erdos993Lean.Analytic.HardCore.Tail",
+  "Erdos993Lean.Analytic.HardCore.Leaves", "Erdos993Lean.Analytic.HardCore.Variance",
+  "Erdos993Lean.Analytic.Density", "Erdos993Lean.Analytic.TopCert",
+  "Erdos993Lean.Analytic.NoValley.Core", "Erdos993Lean.Analytic.NoValley.FiniteRange",
+  "Erdos993Lean.Analytic.NoValley.Identities", "Erdos993Lean.Analytic.NoValley.LossForm",
+  "Erdos993Lean.Analytic.NoValley.LogConcave", "Erdos993Lean.Analytic.NoValley.FibreHalf",
+  "Erdos993Lean.Analytic.NoValley.FibreGeneral",
+  "Erdos993Lean.Analytic.NoValley.Explicit", "Erdos993Lean.Analytic.Tail",
+  "Erdos993Lean.Analytic.Fourier.Gauss", "Erdos993Lean.Analytic.Fourier.CharFun",
+  "Erdos993Lean.Analytic.Fourier.Circle", "Erdos993Lean.Analytic.Fourier.Majorant",
+  "Erdos993Lean.Analytic.Fourier.Numerics", "Erdos993Lean.Analytic.Fourier.Main",
+  "Erdos993Lean.Analytic.LargeMean.Main", "Erdos993Lean.Analytic.Assembly",
+  "Erdos993Lean.Analytic.All", "Erdos993Lean.Analytic.Profile30",
+  "Erdos993Lean.Analytic.Family", "Erdos993Lean.Analytic.Glue30",
+  "Erdos993Lean.Analytic.Density.Bands", "Erdos993Lean.Analytic.Density.Transfer",
+  "Erdos993Lean.Analytic.Density.Partition", "Erdos993Lean.Analytic.Density.Paths",
+  "Erdos993Lean.Analytic.Density.Record", "Erdos993Lean.Analytic.Density.Branches",
+  "Erdos993Lean.Analytic.Density.Induction", "Erdos993Lean.Analytic.Density.Records",
+  "Erdos993Lean.Analytic.Density.Main", "Erdos993Lean.Analytic.TailCert.Glue",
+  "Erdos993Lean.Analytic.TailCert.Sound", "Erdos993Lean.Analytic.Atlas.Checker",
+  "Erdos993Lean.Analytic.Atlas.Params", "Erdos993Lean.Analytic.Atlas.Kernel",
+  "Erdos993Lean.Analytic.Atlas.Bounds", "Erdos993Lean.Analytic.Atlas.Taylor",
+  "Erdos993Lean.Analytic.Atlas.Atoms", "Erdos993Lean.Analytic.Atlas.Fibres",
+  "Erdos993Lean.Analytic.Atlas.Sound", "Erdos993Lean.Analytic.Atlas.Profile",
+  "Erdos993Lean.Analytic.Atlas.Hyps", "Erdos993Lean.Analytic.Reserve.Defs",
+  "Erdos993Lean.Analytic.Reserve.Entropy", "Erdos993Lean.Analytic.Reserve.Tail",
+  "Erdos993Lean.Analytic.Reserve.Step", "Erdos993Lean.Analytic.Reserve.StepBand",
+  "Erdos993Lean.Analytic.Reserve.Moments", "Erdos993Lean.Analytic.Reserve.Tree",
+  "Erdos993Lean.Analytic.Reserve.Induction", "Erdos993Lean.Analytic.Reserve.Assembly",
+  "Erdos993Lean.Analytic.Reserve.UpperDefs", "Erdos993Lean.Analytic.Reserve.Cert.Sound",
+  "Erdos993Lean.Analytic.Reserve.Cert.Leaf", "Erdos993Lean.Analytic.Reserve.UpperBounds",
+  "Erdos993Lean.Analytic.Reserve.UpperTail", "Erdos993Lean.Analytic.Reserve.UpperLeaf",
+  "Erdos993Lean.Analytic.Reserve.UpperStep", "Erdos993Lean.Analytic.Reserve.O1Profile30"]
+
+[[lean_lib]]
+name = "Erdos993LeanAnalyticFinal"
+roots = ["Erdos993Lean.Analytic.TopFinal"]
+
+[[lean_lib]]
+name = "Erdos993LeanTailCertCompute"
+roots = ["Erdos993Lean.Analytic.TailCert.Compute.Bands"]
+globs = ["Erdos993Lean.Analytic.TailCert.Compute.+"]
+precompileModules = true
+
+[[lean_lib]]
+name = "Erdos993LeanTailCert"
+roots = ["Erdos993Lean.Analytic.TailCert.Main"]
+globs = ["Erdos993Lean.Analytic.TailCert.Checks.+", "Erdos993Lean.Analytic.TailCert.Main"]
+
+[[lean_lib]]
+name = "Erdos993LeanAnalyticState"
+roots = ["Erdos993Lean.Analytic.State"]
+
+[[lean_lib]]
+name = "Erdos993LeanAtlas"
+roots = ["Erdos993Lean.Analytic.Atlas.Main"]
+globs = ["Erdos993Lean.Analytic.Atlas.Data.+", "Erdos993Lean.Analytic.Atlas.Checks.+"]
+
+[[lean_lib]]
+name = "Erdos993LeanReserveCertCompute"
+roots = ["Erdos993Lean.Analytic.Reserve.Cert.Compute.Cell"]
+globs = ["Erdos993Lean.Analytic.Reserve.Cert.Compute.+"]
+precompileModules = true
+
+[[lean_lib]]
+name = "Erdos993LeanReserveCert"
+roots = ["Erdos993Lean.Analytic.Reserve.Cert.Main", "Erdos993Lean.Analytic.Reserve.Cert.Bands"]
+globs = ["Erdos993Lean.Analytic.Reserve.Cert.Checks.+", "Erdos993Lean.Analytic.Reserve.Cert.Main",
+  "Erdos993Lean.Analytic.Reserve.Cert.Bands"]
