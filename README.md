@@ -46,6 +46,13 @@ Proposition 1.2:
   - The axioms of the final theorem are therefore `propext`, `Classical.choice`, `Quot.sound`,
     `Lean.ofReduceBool` and `Lean.trustCompiler`.
 
+- **Kernel-checked certificates** (optional target `lake build Erdos993LeanZhangKernel`): the same certificate claim
+  checked by the Lean kernel itself, with no `native_decide` and standard axioms only.
+  - `Zhang.certificatesSound_kernel` is proved by 900 `decide +kernel` slices over a kernel-reducible mirror of the
+    checker (`Erdos993Lean/ZhangKernel/`); the whole run takes about 10 minutes of kernel time.
+  - `Zhang.forest_unimodal_of_card_le_sixty_kernel` is the 60-vertex theorem on `propext`, `Classical.choice` and
+    `Quot.sound` alone (`Erdos993Lean/ZhangKernel/Audit.lean` prints the axioms).
+
 ## Build
 
 ```sh
@@ -53,6 +60,8 @@ lake exe cache get
 lake build
 lake build Erdos993LeanZhangCert
 lake env lean Audit/AxiomsZhangCert.lean
+lake build Erdos993LeanZhangKernel        # kernel-checked certificates; about 10 minutes, a few GB of memory
+lake env lean Erdos993Lean/ZhangKernel/Audit.lean
 ```
 
 The last command prints the axioms of the headline results.
@@ -65,6 +74,7 @@ The last command prints the axioms of the headline results.
 | `Erdos993Lean/Zhang/` | König for forests, decomposition, coefficient bounds, relaxation, the reduction for n ≤ 60 |
 | `Erdos993Lean/Zhang/Rows/` | the inequality families |
 | `Erdos993Lean/ZhangCert/`, `Erdos993LeanZhangCompute/` | the certificate checker, its soundness, the data and the final theorem |
+| `Erdos993Lean/ZhangKernel/` | the kernel-checked certificates: a kernel-reducible checker, its soundness and the 900 kernel slices |
 
 The Zhang modules also import a few general supporting modules from a larger package, for unimodality lemmas, the
 bipartite tail and matching bounds: `Ceiling/`, `SmallAlpha/`, `Floor/`, `Caterpillar/`, `Hoggar.lean`,

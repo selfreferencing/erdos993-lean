@@ -27,3 +27,12 @@ precompileModules = true
 [[lean_lib]]
 name = "Erdos993LeanZhangCert"
 roots = ["Erdos993Lean.ZhangCert.Main", "Erdos993Lean.ZhangCert.Final"]
+
+# Optional: T. Zhang's 17,100 finite-part certificates checked by the Lean kernel itself
+# (`decide +kernel`, no `native_decide`; standard axioms only).  Build by module name, one module at a
+# time if memory is tight; see the header of `Erdos993Lean/ZhangKernel/Main.lean`.
+# `lake build Erdos993LeanZhangKernel`.
+[[lean_lib]]
+name = "Erdos993LeanZhangKernel"
+roots = ["Erdos993Lean.ZhangKernel.Main"]
+globs = ["Erdos993Lean.ZhangKernel.+"]
