@@ -11,9 +11,9 @@ campaign repository, pinned 2026-08-16): forests are simple graphs on `Fin n` sa
 `SimpleGraph.IsAcyclic`, independent sets are counted with Mathlib's `indepSetFinset`, and
 unimodality is weak unimodality up to the independence number.
 
-Erdős Problem #993 asks whether `Erdos993Statement` holds.  **It is open; nothing in this package
-proves it.**  The package proves the statement for particular families of forests and records
-the campaign's other results at their honest grade (see `README.md`).
+Erdős Problem #993 asks whether `Erdos993Statement` holds.  On the branch `analytic-route` of this
+repository it is proved with no hypotheses: `Erdos993Lean.Analytic.erdos993 : Erdos993Statement`
+(`Erdos993Lean/Analytic/Erdos993.lean`; see `README.md` and `WHAT_WE_DID.md`).
 
 This file also records the bridge from the package's own sequence predicates
 (`Erdos993Lean.Unimodal`) to `UnimodalUpTo`.
@@ -53,7 +53,8 @@ noncomputable def independenceNumber (F : FiniteForest) : Nat :=
 noncomputable def independenceSequenceUnimodal (F : FiniteForest) : Prop :=
   UnimodalUpTo (independenceNumber F) (independenceCount F)
 
-/-- **Erdős Problem #993** (open): every finite forest has a unimodal independence sequence. -/
+/-- **Erdős Problem #993**: every finite forest has a unimodal independence sequence.  Proved as
+`Erdos993Lean.Analytic.erdos993` on the branch `analytic-route`. -/
 noncomputable def Erdos993Statement : Prop :=
   ∀ forest : FiniteForest, independenceSequenceUnimodal forest
 

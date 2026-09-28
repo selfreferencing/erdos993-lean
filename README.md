@@ -66,8 +66,7 @@ theorem Erdos993Lean.Analytic.erdos993 : Erdos993Lean.Erdos993Statement
 ```
 
 The theorem is in `Erdos993Lean/Analytic/Erdos993.lean`. `Erdos993Statement` says that every `FiniteForest` has a
-unimodal independence sequence; its definitions are the ones described above, in `Erdos993Lean/Statement.lean`. That
-file's docstring still calls the problem open, because it is kept byte-identical to the pinned statement file.
+unimodal independence sequence; its definitions are the ones described above, in `Erdos993Lean/Statement.lean`.
 
 The proof has two parts.
 - **Forests with at most 60 vertices.** The kernel-checked certificates above (`Zhang.certificatesSound_kernel`).

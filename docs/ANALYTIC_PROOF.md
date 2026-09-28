@@ -304,4 +304,5 @@ finite part is the kernel-checked one.
 
   Each of O1–O6 was reviewed independently before the referee adopted it; §5 lists, per certificate family, what was
   replayed and by which code.
-- **All files are available** (proof documents, certificates, checkers, review reports).
+- **The supporting files are available on request**: the proof documents, certificates, checkers and review reports
+  named above. The Lean sources and this write-up are in the repository.
