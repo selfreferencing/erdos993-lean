@@ -1,0 +1,29 @@
+name = "Erdos993Lean"
+version = "0.1.0"
+defaultTargets = ["Erdos993Lean"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.28.0"
+
+# Default target: the statement, T. Zhang's reduction for forests with at most 60 vertices and his
+# inequality families (standard axioms only).
+[[lean_lib]]
+name = "Erdos993Lean"
+
+# Optional: T. Zhang's 17,100 finite-part certificates checked in Lean (`native_decide` on natively
+# compiled code) and the final theorem.  `lake build Erdos993LeanZhangCert`.
+[[lean_lib]]
+name = "Erdos993LeanZhangCompute"
+roots = ["Erdos993LeanZhangCompute.Checker"]
+precompileModules = true
+
+[[lean_lib]]
+name = "Erdos993LeanZhangCert"
+roots = ["Erdos993Lean.ZhangCert.Main", "Erdos993Lean.ZhangCert.Final"]
