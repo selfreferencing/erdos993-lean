@@ -40,6 +40,8 @@ globs = ["Erdos993Lean.ZhangKernel.+"]
 
 # ---- The analytic route for forests with at least 61 vertices (optional libraries) ----
 
+# Optional (not part of the default target until clean): the analytic route for forests with at
+# least 61 vertices (campaign ProofRuns/2026-09-28_analytic_large_n).  `lake build Erdos993LeanAnalytic`.
 [[lean_lib]]
 name = "Erdos993LeanAnalytic"
 roots = ["Erdos993Lean.Analytic.Defs", "Erdos993Lean.Ceiling.ValleyFree",
@@ -78,7 +80,18 @@ roots = ["Erdos993Lean.Analytic.Defs", "Erdos993Lean.Ceiling.ValleyFree",
   "Erdos993Lean.Analytic.Reserve.UpperDefs", "Erdos993Lean.Analytic.Reserve.Cert.Sound",
   "Erdos993Lean.Analytic.Reserve.Cert.Leaf", "Erdos993Lean.Analytic.Reserve.UpperBounds",
   "Erdos993Lean.Analytic.Reserve.UpperTail", "Erdos993Lean.Analytic.Reserve.UpperLeaf",
-  "Erdos993Lean.Analytic.Reserve.UpperStep", "Erdos993Lean.Analytic.Reserve.O1Profile30"]
+  "Erdos993Lean.Analytic.Reserve.UpperStep", "Erdos993Lean.Analytic.Reserve.O1Profile30",
+  "Erdos993Lean.Analytic.Reserve.UpperCert.Sound", "Erdos993Lean.Analytic.O2.Defs",
+  "Erdos993Lean.Analytic.O2.Main", "Erdos993Lean.Analytic.O2.Knots",
+  "Erdos993Lean.Analytic.O2.Final", "Erdos993Lean.Analytic.O2.Leaf",
+  "Erdos993Lean.Analytic.O2.Cert.DualSound", "Erdos993Lean.Analytic.O2.Cert.KernelSound",
+  "Erdos993Lean.Analytic.O2.Cert.PackSound", "Erdos993Lean.Analytic.O2.Cert.ContextSound",
+  "Erdos993Lean.Analytic.O2.Cert.BernSound", "Erdos993Lean.Analytic.O2.Cert.QuadSound",
+  "Erdos993Lean.Analytic.O2.Cert.LowerSound", "Erdos993Lean.Analytic.O2.Cert.PartSound",
+  "Erdos993Lean.Analytic.O2.Cert.ListSound", "Erdos993Lean.Analytic.O2.Cert.SourceSound",
+  "Erdos993Lean.Analytic.O2.Cert.PieceSound", "Erdos993Lean.Analytic.O2.Cert.PieceFind",
+  "Erdos993Lean.Analytic.O2.Cert.CellSound", "Erdos993Lean.Analytic.O2.Cert.CoverSound",
+  "Erdos993Lean.Analytic.O2.Cert.Bridge"]
 
 [[lean_lib]]
 name = "Erdos993LeanAnalyticFinal"
@@ -115,3 +128,48 @@ name = "Erdos993LeanReserveCert"
 roots = ["Erdos993Lean.Analytic.Reserve.Cert.Main", "Erdos993Lean.Analytic.Reserve.Cert.Bands"]
 globs = ["Erdos993Lean.Analytic.Reserve.Cert.Checks.+", "Erdos993Lean.Analytic.Reserve.Cert.Main",
   "Erdos993Lean.Analytic.Reserve.Cert.Bands"]
+
+# Optional (lane A15): the verified cell checker of O1's upper finite box (Astra's upper cells, refined), computational
+# core and data (Lean core, lane A10's interval core and lane A12's compute core only, so that it can be precompiled;
+# the soundness proofs, standard axioms only, are in `Erdos993Lean/Analytic/Reserve/UpperCert/Sound.lean`).  Declared
+# after `Erdos993Lean` so that it owns its modules.  `lake build Erdos993LeanUpperCertCompute`.
+[[lean_lib]]
+name = "Erdos993LeanUpperCertCompute"
+roots = ["Erdos993Lean.Analytic.Reserve.UpperCert.Compute.Cell"]
+globs = ["Erdos993Lean.Analytic.Reserve.UpperCert.Compute.+"]
+precompileModules = true
+
+# Optional (lane A15): `UpperBoxOK`, the checks evaluated by `native_decide` (one module per trie piece,
+# `Erdos993Lean/Analytic/Reserve/UpperCert/Checks/*.lean`), and the consumers `varianceBound_profile30`,
+# `erdos993_of_O2` (`UpperCert/Final.lean`).  Build by module name, one module at a time; see the header of
+# `Erdos993Lean/Analytic/Reserve/UpperCert/Main.lean`.
+[[lean_lib]]
+name = "Erdos993LeanUpperCert"
+roots = ["Erdos993Lean.Analytic.Reserve.UpperCert.Main", "Erdos993Lean.Analytic.Reserve.UpperCert.Final"]
+globs = ["Erdos993Lean.Analytic.Reserve.UpperCert.Checks.+", "Erdos993Lean.Analytic.Reserve.UpperCert.Main",
+  "Erdos993Lean.Analytic.Reserve.UpperCert.Final"]
+
+# Optional (lane A18): the O2 certificate checker (the local payment on the O2 bands), computational core and data
+# (Lean core and lane A10's interval core only, so that it can be precompiled; the soundness proofs, standard axioms
+# only, are in `Erdos993Lean/Analytic/O2/Cert/*.lean`).  `lake build Erdos993LeanO2CertCompute`.
+[[lean_lib]]
+name = "Erdos993LeanO2CertCompute"
+roots = ["Erdos993Lean.Analytic.O2.Cert.Compute.Engine"]
+globs = ["Erdos993Lean.Analytic.O2.Cert.Compute.+"]
+precompileModules = true
+
+# Optional (lane A18): the O2 band checks evaluated by `native_decide` (one module per root box,
+# `Erdos993Lean/Analytic/O2/Cert/Checks/*.lean`) and `localPaymentOK_<band>`.  Build by module name, one module at a
+# time; see the header of `Erdos993Lean/Analytic/O2/Cert/Main.lean`.
+[[lean_lib]]
+name = "Erdos993LeanO2Cert"
+roots = ["Erdos993Lean.Analytic.O2.Cert.Main"]
+globs = ["Erdos993Lean.Analytic.O2.Cert.Checks.+", "Erdos993Lean.Analytic.O2.Cert.Bands.+",
+  "Erdos993Lean.Analytic.O2.Cert.Main"]
+
+# Optional: the unconditional theorem `Erdos993Lean.Analytic.erdos993 : Erdos993Statement` (Erdős Problem #993).  It
+# imports every certificate layer of the analytic route (native_decide: tail, atlas, O1, O2) and the kernel-checked
+# finite part.  `lake build Erdos993LeanTheorem`.
+[[lean_lib]]
+name = "Erdos993LeanTheorem"
+roots = ["Erdos993Lean.Analytic.Erdos993"]

@@ -1,11 +1,14 @@
-# Erdős Problem #993: every forest with at most 60 vertices is unimodal (Lean 4)
+# Erdős Problem #993 in Lean 4: every forest has a unimodal independence sequence
 
 Private preview, not for redistribution. The license is to be decided.
 
-This repository is a Lean 4 formalization, with Mathlib `v4.28.0`, of the finite part of T. Zhang's method for Erdős
-Problem #993. It proves that the independence sequence of every forest with at most 60 vertices is unimodal.
+This repository is a Lean 4 formalization, with Mathlib `v4.28.0`, of Erdős Problem #993.
+- Branch `main` formalizes the finite part of T. Zhang's method: the independence sequence of every forest with at
+  most 60 vertices is unimodal.
+- This branch, `analytic-route`, adds an analytic argument for forests with at least 61 vertices. With it, the full
+  statement is proved with no hypotheses; see "The whole theorem" below.
 
-## Main theorem
+## The finite part: forests with at most 60 vertices
 
 ```lean
 theorem Erdos993Lean.Zhang.forest_unimodal_of_card_le_sixty (F : FiniteForest) (hn : F.n ≤ 60) :
@@ -53,40 +56,42 @@ Proposition 1.2:
   - `Zhang.forest_unimodal_of_card_le_sixty_kernel` is the 60-vertex theorem on `propext`, `Classical.choice` and
     `Quot.sound` alone (`Erdos993Lean/ZhangKernel/Audit.lean` prints the axioms).
 
-## The analytic route: forests with at least 61 vertices (branch `analytic-route`)
-
-This branch adds a Lean formalization of an analytic argument for large forests, built on T. Zhang's conditional
-binomial mixture over a maximum-weight independent set. Everything is proved in Lean except the two hypotheses of the
-top theorem:
+## The whole theorem (branch `analytic-route`)
 
 ```lean
-theorem Erdos993Lean.Analytic.State.erdos993_of_upperBox_O2
-    (hU : Erdos993Lean.Analytic.Reserve.UpperBoxOK)
-    (h2 : Erdos993Lean.Analytic.VarianceRatioBound Erdos993Lean.Analytic.Profile30.P) :
-    Erdos993Statement
+theorem Erdos993Lean.Analytic.erdos993 : Erdos993Lean.Erdos993Statement
 ```
 
-(`Erdos993Lean/Analytic/State.lean`).
+The theorem is in `Erdos993Lean/Analytic/Erdos993.lean`. `Erdos993Statement` says that every `FiniteForest` has a
+unimodal independence sequence; its definitions are the ones described above, in `Erdos993Lean/Statement.lean`. That
+file's docstring still calls the problem open, because it is kept byte-identical to the pinned statement file.
 
-- **Proved in Lean**, together with the kernel-checked finite part above:
-  - the reduction to excluding weak valleys at interior ranks of an activity window [1/3, 7/3];
+The proof has two parts.
+- **Forests with at most 60 vertices.** The kernel-checked certificates above (`Zhang.certificatesSound_kernel`).
+- **Forests with at least 61 vertices.** An analytic argument built on T. Zhang's conditional binomial mixture over a
+  maximum-weight independent set. Everything is proved in Lean:
+  - the reduction to excluding weak valleys at interior ranks, each of which is the hard-core mean at an activity in
+    [1/3, 7/3] (O6);
   - the mixture identities;
-  - an explicit no-valley lemma;
-  - a large-mean Fourier theorem;
-  - a small-mean atlas of dual certificates;
-  - the lower tail of the free count;
-  - density floors;
-  - the variance of the free count (input O1) on all five activity bands, except the finite box of the top band.
-- **`UpperBoxOK`**: the finite box of the top band's O1 certificate (617,294 cells). It is proved on paper and
-  independently replayed; its Lean checker is in progress.
-- **`VarianceRatioBound Profile30.P`** (input O2), the variance-ratio bound: in progress.
+  - an explicit no-valley lemma, with a small-mean atlas of rational dual certificates and a large-mean Fourier
+    theorem (O4);
+  - the lower tail of the free count M (O3) and floors on its mean (O5);
+  - Var M ≤ D·m on all five activity bands (O1, `VarianceBound Profile30.P`);
+  - Var K ≤ (1+θ)(1−q)W on the whole activity window (O2, `VarianceRatioBound Profile30.P`), from 14 certified
+    coefficient rows.
 
-Trust: standard axioms, plus `Lean.ofReduceBool` and `Lean.trustCompiler` through 94 `native_decide` certificate
-checks. Their soundness is proved in Lean on standard axioms: 30 for the tail cells, 60 for the atlas and 4 for O1's
-lower bands.
+Trust. Every soundness theorem uses only the standard axioms. The analytic route evaluates its certificates with
+exactly 271 `native_decide` calls: 30 for the tail cells, 60 for the atlas, 13 for O1 and 168 for O2. These calls add
+`Lean.ofReduceBool` and `Lean.trustCompiler`:
 
-Build: `lake build Erdos993LeanAnalyticState`, which also builds the certificate libraries it needs. Build the check
-modules one at a time if memory is tight.
+```
+'Erdos993Lean.Analytic.erdos993' depends on axioms:
+  [propext, Classical.choice, Lean.ofReduceBool, Lean.trustCompiler, Quot.sound]
+```
+
+Build with `lake build Erdos993LeanTheorem`, then run `lake env lean Audit/AxiomsTheorem.lean`. The certificate check
+modules are large, so if memory is tight, build them one module at a time first; see the header of each certificate
+library's `Main.lean`.
 
 ## Build
 
@@ -97,6 +102,8 @@ lake build Erdos993LeanZhangCert
 lake env lean Audit/AxiomsZhangCert.lean
 lake build Erdos993LeanZhangKernel        # kernel-checked certificates; a few GB of memory per module
 lake env lean Erdos993Lean/ZhangKernel/Audit.lean
+lake build Erdos993LeanTheorem             # the whole theorem, with every certificate library it needs
+lake env lean Audit/AxiomsTheorem.lean
 ```
 
 The two audit commands print the axioms of the headline results. A from-scratch build of all three targets, with only
@@ -111,6 +118,7 @@ Mathlib's cache, took about 51 minutes on a busy 10-core machine, mostly the 24 
 | `Erdos993Lean/Zhang/Rows/` | the inequality families |
 | `Erdos993Lean/ZhangCert/`, `Erdos993LeanZhangCompute/` | the certificate checker, its soundness, the data and the final theorem |
 | `Erdos993Lean/ZhangKernel/` | the kernel-checked certificates: a kernel-reducible checker, its soundness and the 900 kernel slices |
+| `Erdos993Lean/Analytic/` | the argument for n ≥ 61: the mixture, the window, the no-valley lemma, the atlas (`Atlas/`), the tail (`TailCert/`), the floors, O1 (`Reserve/`), O2 (`O2/`), and the whole theorem (`Erdos993.lean`) |
 
 The Zhang modules also import a few general supporting modules from a larger package, for unimodality lemmas, the
 bipartite tail and matching bounds: `Ceiling/`, `SmallAlpha/`, `Floor/`, `Caterpillar/`, `Hoggar.lean`,
