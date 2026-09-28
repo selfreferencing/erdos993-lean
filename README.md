@@ -60,11 +60,12 @@ lake exe cache get
 lake build
 lake build Erdos993LeanZhangCert
 lake env lean Audit/AxiomsZhangCert.lean
-lake build Erdos993LeanZhangKernel        # kernel-checked certificates; about 10 minutes, a few GB of memory
+lake build Erdos993LeanZhangKernel        # kernel-checked certificates; a few GB of memory per module
 lake env lean Erdos993Lean/ZhangKernel/Audit.lean
 ```
 
-The last command prints the axioms of the headline results.
+The two audit commands print the axioms of the headline results. A from-scratch build of all three targets, with only
+Mathlib's cache, took about 51 minutes on a busy 10-core machine, mostly the 24 kernel-check modules.
 
 ## Layout
 
