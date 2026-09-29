@@ -173,3 +173,9 @@ globs = ["Erdos993Lean.Analytic.O2.Cert.Checks.+", "Erdos993Lean.Analytic.O2.Cer
 [[lean_lib]]
 name = "Erdos993LeanTheorem"
 roots = ["Erdos993Lean.Analytic.Erdos993"]
+
+# Optional: the statement of Erdős Problem 993 in google-deepmind/formal-conjectures (pull request #4192, copied
+# verbatim), proved from `Erdos993Lean.Analytic.erdos993`.  `lake build Erdos993LeanFormalConjectures`.
+[[lean_lib]]
+name = "Erdos993LeanFormalConjectures"
+roots = ["Erdos993Lean.FormalConjectures.Erdos993"]
