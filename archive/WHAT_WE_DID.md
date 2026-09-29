@@ -1,3 +1,5 @@
+> Note: superseded by README.md (v1.0-claim).
+
 # What we did
 
 A note for Tong Zhang from Kevin Vallier's Erdős #993 campaign, 2026-09-28.

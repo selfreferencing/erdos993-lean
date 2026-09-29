@@ -1,0 +1,21 @@
+NOTICE
+
+Certificate data
+----------------
+The finite-order certificate data in this repository are copyright Tong Zhang and Wei Li
+(School of Mathematics and Statistics, Northwestern Polytechnical University, Xi'an) and are
+redistributed here with their permission under the Creative Commons Attribution 4.0 International
+license (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/.
+
+Source: https://github.com/zhangzenozhang-jpg/-forest-unimodality-proof, commit d5669d7,
+file inputs/forest_n60_extension_and_n100_gap.zip -> certificates.json
+(SHA-256 a77f4fc43aec1b8eecab91c4418b6990f72dee69d802129c78efd67d2e1bcc5a).
+The same file is in https://github.com/zhangzenozhang-jpg/forest-unimodality-arxiv-verification,
+commit 8067893, under companion/2026-09-27/anc/repro/inputs/.
+
+Modifications: the JSON data are stored as Lean string literals in
+Erdos993LeanZhangCompute/Checker/Data1.lean through Data5.lean, and as generated check items in
+Erdos993Lean/ZhangKernel/Data/. No certificate values were changed.
+
+This license applies to the certificate data only. The Lean code in this repository is licensed
+separately; see LICENSE.

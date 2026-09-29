@@ -1,127 +1,256 @@
-# Erdős Problem #993 in Lean 4: every forest has a unimodal independence sequence
+# Erdős Problem #993 in Lean 4
 
-Private preview, not for redistribution. The license is to be decided.
+Lean 4 formalization of a proof of Erdős Problem #993 (the Alavi–Malde–Schwenk–Erdős conjecture), built on the proof
+due to Tong Zhang and Wei Li.
 
-This repository is a Lean 4 formalization, with Mathlib `v4.28.0`, of Erdős Problem #993.
-- Branch `main` formalizes the finite part of T. Zhang's method: the independence sequence of every forest with at
-  most 60 vertices is unimodal.
-- This branch, `analytic-route`, adds an analytic argument for forests with at least 61 vertices. With it, the full
-  statement is proved with no hypotheses; see "The whole theorem" below.
+We claim a Lean 4 proof that the independent set sequence of every finite forest is unimodal.
+- **Forests with at most 60 vertices.** The formalization follows Zhang and Li's finite-order argument, and all 17,100
+  of their certificate cases are checked in Lean.
+- **Forests with at least 61 vertices.** The formalization uses a different argument. It keeps Zhang and Li's
+  conditional binomial mixture but replaces their large-order argument. This argument was developed in this project,
+  and it has not been independently reviewed.
 
-`WHAT_WE_DID.md` explains in plain terms what was done and by whom. `docs/ANALYTIC_PROOF.md` gives the mathematics of
-the argument for forests with at least 61 vertices.
+The finite-order mathematics and the mixture are Zhang and Li's. The large-order argument and the formalization come
+from Kevin Vallier's project; see "Method".
 
-## The finite part: forests with at most 60 vertices
+Zhang and Li's work:
+- T. Zhang and W. Li, *Unimodality of Forest Independence Polynomials*, manuscript, Zenodo,
+  <https://doi.org/10.5281/zenodo.22999166> (not yet refereed; an arXiv version is in preparation). The verification materials
+  are at <https://github.com/zhangzenozhang-jpg/forest-unimodality-arxiv-verification> (companion version 2026-09-27,
+  commit `8067893`).
+- The earlier consolidated manuscript, which is the version cited by section number in the Lean comments: T. Zhang,
+  *Exact Certificates for Unimodality of Forest Independence Polynomials*, v1.1 (26 September 2026),
+  <https://github.com/zhangzenozhang-jpg/-forest-unimodality-proof> (commit `d5669d7`).
+
+## Main theorem
 
 ```lean
-theorem Erdos993Lean.Zhang.forest_unimodal_of_card_le_sixty (F : FiniteForest) (hn : F.n ≤ 60) :
+theorem Erdos993Lean.Analytic.erdos993 : Erdos993Statement
+```
+
+The theorem is in `Erdos993Lean/Analytic/Erdos993.lean`. Its statement uses these definitions, verbatim from
+`Erdos993Lean/Statement.lean`:
+
+```lean
+/-- A finite forest encoded as a simple graph on the vertex type `Fin n`. -/
+structure FiniteForest where
+  n : Nat
+  graph : SimpleGraph (Fin n)
+  isForest : graph.IsAcyclic
+
+/--
+`UnimodalUpTo N a` says that the finite sequence `a 0, a 1, ..., a N` has a peak: it is
+nondecreasing before the peak and nonincreasing after it.
+-/
+def UnimodalUpTo (N : Nat) (a : Nat → Nat) : Prop :=
+  ∃ peak : Nat,
+    peak ≤ N ∧
+      (∀ k : Nat, k < peak → a k ≤ a (k + 1)) ∧
+      (∀ k : Nat, peak ≤ k → k < N → a (k + 1) ≤ a k)
+
+/-- The number of independent sets of cardinality `k` in a finite forest (Mathlib's
+`indepSetFinset`, classical decidability). -/
+noncomputable def independenceCount (F : FiniteForest) (k : Nat) : Nat := by
+  classical
+  exact (F.graph.indepSetFinset k).card
+
+/-- The maximum size of an independent set in the finite forest. -/
+noncomputable def independenceNumber (F : FiniteForest) : Nat :=
+  F.graph.indepNum
+
+/-- The independence sequence of `F` is unimodal through its independence number. -/
+noncomputable def independenceSequenceUnimodal (F : FiniteForest) : Prop :=
+  UnimodalUpTo (independenceNumber F) (independenceCount F)
+
+noncomputable def Erdos993Statement : Prop :=
+  ∀ forest : FiniteForest, independenceSequenceUnimodal forest
+```
+
+In plain English: let F be a finite forest with independence number α, and let i_k be the number of independent sets
+of size k. Then for some p, i₀ ≤ i₁ ≤ … ≤ i_p ≥ i_{p+1} ≥ … ≥ i_α.
+
+Conventions:
+- **Forests, not only trees.** A forest is any acyclic simple graph on n labelled vertices. This includes disconnected
+  graphs and the empty graph (n = 0).
+- **The sequence starts at i₀ = 1.** The empty set is counted; the lemma `independenceCount_zero` proves
+  `independenceCount F 0 = 1`.
+- **Unimodality is stated for i₀, …, i_α.** Since i_k = 0 for every k > α, this is the same as unimodality of the
+  whole sequence (i_k)_{k ≥ 0}. That equivalence is elementary and is not stated as a separate theorem here.
+
+## Verification status
+
+- **Lean:** `leanprover/lean4:v4.28.0` (file `lean-toolchain`).
+- **Mathlib:** commit `8f9d9cff6bd728b17a24e163c9402775d9e6a365` (tag `v4.28.0`), pinned in `lake-manifest.json`.
+- **Axioms.** `#print axioms Erdos993Lean.Analytic.erdos993` prints:
+
+  ```
+  'Erdos993Lean.Analytic.erdos993' depends on axioms: [propext,
+   Classical.choice,
+   Lean.ofReduceBool,
+   Lean.trustCompiler,
+   Quot.sound]
+  ```
+
+- **`sorry`: none.** `git grep -n -w sorry -- '*.lean'` returns 4 lines, all inside comments (for example "no `sorry`").
+  The axiom list above contains no `sorryAx`.
+- **Other markers.** There are no `axiom` declarations. `unsafe`, `implemented_by` and `@[extern]` appear only in
+  comments, never in code.
+- **`native_decide`.** **The theorem depends on `native_decide`: its axioms include `Lean.ofReduceBool` and
+  `Lean.trustCompiler` as well as `propext`, `Classical.choice` and `Quot.sound`.** The modules the theorem imports
+  contain 271 `native_decide` evaluations, all in the argument for forests with at least 61 vertices. For those steps
+  the proof trusts the Lean compiler and runtime, not only the kernel. The finite part (at most 60 vertices) does not
+  use `native_decide`: its certificates are checked by kernel reduction (`decide +kernel`).
+
+## Structure of the proof
+
+There are two parts, joined at 60/61 vertices.
+
+**Forests with at most 60 vertices.**
+
+```lean
+theorem Erdos993Lean.Zhang.forest_unimodal_of_card_le_sixty_kernel (F : FiniteForest) (hn : F.n ≤ 60) :
     independenceSequenceUnimodal F
 ```
 
-The theorem is in `Erdos993Lean/ZhangCert/Final.lean`. The definitions of the statement are in
-`Erdos993Lean/Statement.lean`:
-- a `FiniteForest` is a simple graph on `Fin n` that is acyclic in Mathlib's sense (`SimpleGraph.IsAcyclic`);
-- independent sets are counted with Mathlib's `indepSetFinset`;
-- unimodality is weak unimodality up to the independence number.
+- The file is `Erdos993Lean/ZhangKernel/Main.lean`.
+- The reduction to a finite certificate claim is Zhang and Li's (`Erdos993Lean/Zhang/`, `Erdos993Lean/Zhang/Rows/`).
+- The certificate claim `Zhang.certificatesSound_kernel` covers the 17,100 parameter triples (n, a, k) of the domain
+  `P60`:
+  - 2 ≤ n ≤ 60, ⌈n/2⌉ ≤ a ≤ n − 1, 1 ≤ k < ⌊(2a+1)/3⌋ (`Erdos993Lean/Zhang/Relaxation.lean`);
+  - `#eval P60.card` prints `17100`.
+- They are checked by 900 kernel evaluations (`decide +kernel`), one per pair (n, a), in the 24 modules of
+  `Erdos993Lean/ZhangKernel/Checks/`.
+- The checker's soundness is proved in Lean for arbitrary data.
+- The axioms of this part are `[propext, Classical.choice, Quot.sound]`, both for `forest_unimodal_of_card_le_sixty_kernel`
+  and for `Zhang.certificatesSound_kernel`.
+- Build time, clean clone: the 24 check modules took 7,067 s of module time (longest 557 s), and the 24 generated data
+  modules another 1,887 s. The build runs modules in parallel, so these are module times, not wall time.
 
-## Method
+**Forests with at least 61 vertices.** `noWeakValley_of_analytic_inputs` (`Erdos993Lean/Analytic/Top.lean`, hypothesis
+`61 ≤ F.n`) excludes a weak valley at every interior rank. Six inputs about the mixture are proved in Lean:
+- O6, the activity window;
+- O1, a variance bound Var M ≤ D·m;
+- O2, a variance-ratio bound Var K ≤ (1+θ)(1−q)W;
+- O3, a lower tail for M;
+- O4, a no-valley criterion;
+- O5, a floor on E M.
 
-The method is T. Zhang, *Exact Certificates for Unimodality of Forest Independence Polynomials*, v1.1 (2026),
-Proposition 1.2:
-- König's theorem for forests;
-- the decomposition relative to a maximum independent set with few edges in its complement (Lemma 2.5);
-- the path and matching bounds;
-- the relaxation and certificate principle;
-- the eleven families of linear inequalities (Section 2.9);
-- the 17,100 parameter cases settled by certificates.
+Four families of parameter-box certificates are checked by the 271 `native_decide` evaluations above:
+- 30 tail bands (`Analytic/TailCert/Checks/`);
+- 60 atlas bands (`Analytic/Atlas/Checks/`);
+- 13 O1 boxes (`Analytic/Reserve/Cert/Checks/`, `Analytic/Reserve/UpperCert/Checks/`);
+- 168 O2 root boxes (`Analytic/O2/Cert/Checks/`).
 
-## What is proved, and with which axioms
+These certificates do not depend on the forest.
 
-- **Default target** (`lake build`), standard axioms only (`propext`, `Classical.choice`, `Quot.sound`):
-  - the statement;
-  - König for forests (`Zhang.indepNum_add_matchingNumber`);
-  - the decomposition, the coefficient bounds, and the relaxation and certificate principle;
-  - the reduction (`Zhang.finite60_of_sound`);
-  - every inequality family (`Zhang.Rows.rowsSound`).
-- **Optional target** (`lake build Erdos993LeanZhangCert`): the certificate claim `Zhang.certificatesSound`.
-  - A certificate checker is written in Lean, and its soundness is proved for arbitrary data
-    (`ZhangCertX.checkRange_sound`, standard axioms).
-  - The checker is evaluated on the author's certificate data by exactly one `native_decide`
-    (`ZhangCertX.checkRange_2_60`, a few seconds). The data are 49 strings in
-    `Erdos993LeanZhangCompute/Checker/Data*.lean`.
-  - The axioms of the final theorem are therefore `propext`, `Classical.choice`, `Quot.sound`,
-    `Lean.ofReduceBool` and `Lean.trustCompiler`.
-
-- **Kernel-checked certificates** (optional target `lake build Erdos993LeanZhangKernel`): the same certificate claim
-  checked by the Lean kernel itself, with no `native_decide` and standard axioms only.
-  - `Zhang.certificatesSound_kernel` is proved by 900 `decide +kernel` slices over a kernel-reducible mirror of the
-    checker (`Erdos993Lean/ZhangKernel/`); the whole run takes about 10 minutes of kernel time.
-  - `Zhang.forest_unimodal_of_card_le_sixty_kernel` is the 60-vertex theorem on `propext`, `Classical.choice` and
-    `Quot.sound` alone (`Erdos993Lean/ZhangKernel/Audit.lean` prints the axioms).
-
-## The whole theorem (branch `analytic-route`)
+**The composition** (`Erdos993Lean/Analytic/Top.lean`):
 
 ```lean
-theorem Erdos993Lean.Analytic.erdos993 : Erdos993Lean.Erdos993Statement
+theorem erdos993_of_analytic_inputs_pending
+    (hmix : MixtureFacts) (hcert : Zhang.Cert.CertificatesSound)
+    {P : Profile} (h : AnalyticInputs P) : Erdos993Statement := by
+  intro F
+  rcases le_or_gt F.n 60 with hn | hn
+  · exact Zhang.Rows.finite60_of_certificates hcert F hn
+  · unfold independenceSequenceUnimodal
+    exact unimodalUpTo_of_unimodal (unimodal_of_noWeakValley_window F
+      (fun k hk1 hk2 => noWeakValley_of_analytic_inputs hmix h F (by omega) k hk1 hk2))
 ```
 
-The theorem is in `Erdos993Lean/Analytic/Erdos993.lean`. `Erdos993Statement` says that every `FiniteForest` has a
-unimodal independence sequence; its definitions are the ones described above, in `Erdos993Lean/Statement.lean`.
+`erdos993` instantiates it. The mixture facts are `mixtureFacts`, the certificate claim is
+`Zhang.certificatesSound_kernel`, and the analytic inputs come from their theorems. The chain is `erdos993` →
+`Reserve.UpperCert.erdos993_of_O2` → `State.erdos993_of_upperBox_O2` → `State.erdos993_of_O1_O2` →
+`Glue30.erdos993_of_profile30` → `erdos993_of_analytic_inputs_std` → `erdos993_of_analytic_inputs_cert` →
+`erdos993_of_analytic_inputs_pending`.
 
-The proof has two parts.
-- **Forests with at most 60 vertices.** The kernel-checked certificates above (`Zhang.certificatesSound_kernel`).
-- **Forests with at least 61 vertices.** An analytic argument built on T. Zhang's conditional binomial mixture over a
-  maximum-weight independent set. Everything is proved in Lean:
-  - the reduction to excluding weak valleys at interior ranks, each of which is the hard-core mean at an activity in
-    [1/3, 7/3] (O6);
-  - the mixture identities;
-  - an explicit no-valley lemma, with a small-mean atlas of rational dual certificates and a large-mean Fourier
-    theorem (O4);
-  - the lower tail of the free count M (O3) and floors on its mean (O5);
-  - Var M ≤ D·m on all five activity bands (O1, `VarianceBound Profile30.P`);
-  - Var K ≤ (1+θ)(1−q)W on the whole activity window (O2, `VarianceRatioBound Profile30.P`), from 14 certified
-    coefficient rows.
+## Relation to the paper
 
-Trust. Every soundness theorem uses only the standard axioms. The analytic route evaluates its certificates with
-exactly 271 `native_decide` calls: 30 for the tail cells, 60 for the atlas, 13 for O1 and 168 for O2. These calls add
-`Lean.ofReduceBool` and `Lean.trustCompiler`:
+**Following Zhang and Li directly.** The Lean comments use the section numbers of Zhang's v1.1 manuscript.
+- **The finite-order theorem** (v1.1, Proposition 1.2):
+  - König's theorem for forests (`Zhang/Konig.lean`);
+  - the decomposition relative to a maximum independent set (`Zhang/Decomposition.lean`);
+  - the coefficient bounds (`Zhang/CoefficientBounds.lean`);
+  - the relaxation and the certificate principle (`Zhang/Relaxation.lean`);
+  - the reduction (`Zhang/Finite60.lean`);
+  - the eleven inequality families (`Zhang/Rows/`);
+  - the certificate layer (`ZhangKernel/`).
+- **The certificate data** are theirs.
+- **The conditional binomial mixture** K = Y + Bin(M, q) over a maximum-weight independent set B, and its identities
+  (`mixtureFacts`, `Analytic/HardCore/`).
 
-```
-'Erdos993Lean.Analytic.erdos993' depends on axioms:
-  [propext, Classical.choice, Lean.ofReduceBool, Lean.trustCompiler, Quot.sound]
-```
+**Replaced.** Zhang and Li's argument for large forests is not formalized. Instead, the formalization proves every
+forest with at least 61 vertices through the inputs O1–O6 above, all built on their mixture. The mathematics is in
+`docs/ANALYTIC_PROOF.md`. O1 and O2 are the project's own inequalities about the hard-core model on forests.
 
-Build with `lake build Erdos993LeanTheorem`, then run `lake env lean Audit/AxiomsTheorem.lean`. The certificate check
-modules are large, so if memory is tight, build them one module at a time first; see the header of each certificate
-library's `Main.lean`.
+## Dependencies and attribution
 
-## Build
+- **FLNYZ (arXiv:2609.20961): not used.** No result of that paper is stated, assumed or proved in this repository.
+- **Galvin–Hilyard: not used.** No result of that paper is stated, assumed or proved in this repository.
+- **No assumptions.** The top theorem has no hypotheses, and there are no `axiom` declarations.
+- **Supporting lemmas from earlier work.** Several supporting lemmas (in `Erdos993Lean/Ceiling/`, `Floor/`, `Caterpillar/` and `SmallAlpha/`) come from the project's earlier work on this problem; comments in those files refer to internal project notes. They are used as lemmas only; no earlier result is claimed here.
+- **Classical results proved here, with their sources.**
+  - Hoggar's theorem that log-concavity is preserved by convolution (`Erdos993Lean/Hoggar.lean`; S. G. Hoggar,
+    J. Combin. Theory Ser. B 16 (1974)).
+  - The decrease of i_k from ⌈(2α − 1)/3⌉ on (`Erdos993Lean/SmallAlpha/BipartiteTail.lean`). This is classical for
+    bipartite graphs (V. E. Levit and E. Mandrescu); the proof here is the project's.
+- **Reused code: none found.**
+  - Compared against github.com/junwei-lu/Erdos_993_Tree_Independent_Set_Unimodality at commit `b2a1d3e`, the Lean
+    formalization of FLNYZ. No shared code beyond generic Mathlib tactic lines. 15 declaration names coincide (for
+    example `indepPoly` and `mem_avail`), with different statements or proofs.
+  - No code from Tong Zhang's repositories.
+- **Reused data: Zhang and Li's certificates.** The source is `certificates.json` (SHA-256 `a77f4fc4…bcc5a`), inside
+  `inputs/forest_n60_extension_and_n100_gap.zip` of github.com/zhangzenozhang-jpg/-forest-unimodality-proof at commit
+  `d5669d7`. The same zip (git blob `e849b89`) is in `companion/2026-09-27/anc/repro/inputs/` of
+  github.com/zhangzenozhang-jpg/forest-unimodality-arxiv-verification at commit `8067893`. The data are stored in two
+  places:
+  - `Erdos993LeanZhangCompute/Checker/Data1.lean`–`Data5.lean`, as strings;
+  - `Erdos993Lean/ZhangKernel/Data/`, as check items generated from them.
+- **Mathlib** is the only Lean dependency (with its own dependencies, pinned in `lake-manifest.json`).
+
+## License
+
+- The Lean code is released under the Apache License 2.0 (`LICENSE`).
+- The certificate data are copyright Tong Zhang and Wei Li and are redistributed here under CC BY 4.0 with their permission; see `NOTICE` for the source commit, the license link and the modifications made.
+
+## Building
 
 ```sh
+git clone https://github.com/selfreferencing/erdos993-lean.git
+cd erdos993-lean
 lake exe cache get
-lake build
-lake build Erdos993LeanZhangCert
-lake env lean Audit/AxiomsZhangCert.lean
-lake build Erdos993LeanZhangKernel        # kernel-checked certificates; a few GB of memory per module
-lake env lean Erdos993Lean/ZhangKernel/Audit.lean
-lake build Erdos993LeanTheorem             # the whole theorem, with every certificate library it needs
+lake build                          # default target: the statement and Zhang and Li's reduction for n ≤ 60
+lake build Erdos993LeanTheorem      # the theorem, with every certificate library it imports
 lake env lean Audit/AxiomsTheorem.lean
 ```
 
-The two audit commands print the axioms of the headline results. A from-scratch build of all three targets, with only
-Mathlib's cache, took about 51 minutes on a busy 10-core machine, mostly the 24 kernel-check modules.
+`lake build` alone does not build the theorem; `lake build Erdos993LeanTheorem` does.
 
-## Layout
+Measured on a clean clone of commit `dde62e4` (2026-09-28/29): Apple M5, 10 cores, 32 GB RAM, macOS 26.3.1.
 
-| Path | Contents |
-|---|---|
-| `Erdos993Lean/Statement.lean` | the statement |
-| `Erdos993Lean/Zhang/` | König for forests, decomposition, coefficient bounds, relaxation, the reduction for n ≤ 60 |
-| `Erdos993Lean/Zhang/Rows/` | the inequality families |
-| `Erdos993Lean/ZhangCert/`, `Erdos993LeanZhangCompute/` | the certificate checker, its soundness, the data and the final theorem |
-| `Erdos993Lean/ZhangKernel/` | the kernel-checked certificates: a kernel-reducible checker, its soundness and the 900 kernel slices |
-| `Erdos993Lean/Analytic/` | the argument for n ≥ 61: the mixture, the window, the no-valley lemma, the atlas (`Atlas/`), the tail (`TailCert/`), the floors, O1 (`Reserve/`), O2 (`O2/`), and the whole theorem (`Erdos993.lean`) |
+| Command | Wall time | Result |
+|---|---|---|
+| `lake exe cache get` | 175 s | exit 0 |
+| `lake build` | 2,025 s | exit 0, 8,063 jobs |
+| `lake build Erdos993LeanTheorem` | 3,732 s | exit 0, 8,709 jobs |
+| `lake env lean` on the axiom audit | 37 s | the output above |
 
-The Zhang modules also import a few general supporting modules from a larger package, for unimodality lemmas, the
-bipartite tail and matching bounds: `Ceiling/`, `SmallAlpha/`, `Floor/`, `Caterpillar/`, `Hoggar.lean`,
-`Sequences.lean` and `IndependencePoly.lean`. Their comments sometimes refer to that package's internal notes.
+The total was 1 h 39 min. The build finished with no errors; its 88 warnings are linter and linker notices, and
+none is a `sorry`. The machine was running other jobs at the same time (load average 27 at the start), so an idle
+machine should be faster. The largest single process peaked at about 6.2 GB of memory.
+
+The certificate modules are large. If memory is tight, build them one module at a time; see the header of each
+certificate library's `Main.lean`. The toolchain and every dependency are pinned (`lean-toolchain`,
+`lake-manifest.json`).
+
+## Method
+
+This formalization was produced by a system of AI agents directed by Kevin Vallier: Anthropic's Claude models, and
+OpenAI's Codex and GPT models. The same system developed the large-order argument. Lean is the check. No human has
+reviewed the Lean code line by line. The claim rests on the Lean kernel and, for the `native_decide` evaluations, on
+the Lean compiler.
+
+## Status
+
+This is an unrefereed claim. The paper has not been peer reviewed. Corrections and questions are welcome.
+
+Contact: Kevin Vallier, kevinvallier@gmail.com.

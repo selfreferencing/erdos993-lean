@@ -2,8 +2,6 @@
 
 # Unimodality of forest independence sequences: an analytic proof for forests with at least 61 vertices
 
-Prepared for Tong Zhang, 2026-09-28. Status as of 17:24 EDT on 2026-09-28.
-
 ## 0. Summary
 
 **Theorem (Erdős Problem #993).** For every finite forest F, the independence sequence i_0(F), i_1(F), …, i_α(F) is
