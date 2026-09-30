@@ -19,7 +19,8 @@ The proof has two parts.
   - It replaces the stage certificates 59 → 900 by five analytic inputs (O1–O5), an activity window (O6), an explicit
     no-valley lemma, a small-mean atlas and a large-mean Fourier theorem.
   - All six inputs O1–O6 have been adopted by the campaign's referee (O2 at 15:23 EDT today), so the argument is
-    complete on paper.
+    complete on paper. The referee is an AI agent (the Claude session that ran this campaign), not a person; no
+    human referee has checked the argument.
   - Several inputs are computer-assisted, and each certificate family was checked differently (§5). The O1 and O2
     certificates were replayed in full by independent code with different interval arithmetic. The O1, O3 and O4
     certificates are checked in Lean by checkers whose soundness is proved; for O3 and O4 these Lean checkers are the
@@ -149,7 +150,12 @@ degree ≥ 2, which includes every maximizer.
 `SHARP_FIRST_FOUR_RESERVE_PROOF.md` (the next three); `UPPER_SHARP_SIGNED_PORT_PROOF.md` for [8/5, 7/3]; and
 `TWO_GENERATION_RESERVE_PROOF.md` (the method, and the universal fallback D = 2 on [1/3, 7/3]).
 
-**The objects.** Root each component. For the subtree at v, let U⁰, V⁰ be the mean and variance of its B-selected
+**The objects.** Root every component that meets B and has a vertex outside B at a vertex outside B. A component inside
+B is a single vertex (B is independent), and a component disjoint from B contributes nothing. Then every vertex
+without children lies in B, which the induction below needs. With an arbitrary root the invariant can fail: a single
+edge rooted at its endpoint in B has a child outside B with F = 0 < α y. This is the rooting of the Lean proof
+(`varB_le_of_component` and `good_of_component` in `Erdos993Lean/Analytic/Reserve/Assembly.lean`).
+For the subtree at v, let U⁰, V⁰ be the mean and variance of its B-selected
 count (the number of vertices of S ∩ B in the subtree: its share of K_B, not of the total count K) when the parent of v
 is unoccupied, and U¹, V¹ the same when the parent is occupied. Put a = 1_B(v), A = 1 + (D−1)q, F = A U⁰ − V⁰,
 G = A U¹ − V¹ = Σ_child F, u = U⁰ − U¹ and y = −log(1 − p), where p is the downward message (the probability that v is
@@ -228,7 +234,7 @@ parent cavity probability):
 Every term except Σ p Φ is nonnegative by construction. The local payment Φ ≥ 0 is certified on the whole physical
 domain: every real signed response, an analytic small-p tail, and a separate leaf endpoint.
 
-**Status: adopted by the referee at 15:23 EDT today.** The basis:
+**Status: adopted by the campaign's AI referee at 15:23 EDT today.** The basis:
 - *Written proof.* An independent review found it correct, with no gap: the innovation identity, Γ, the eight-term
   identity (symbolically, and exactly on small forests and on a selected corpus of 49 actual forests up to 60
   vertices), domain membership, the tail and leaf constants, and the band bookkeeping. Its scope was Pro R2's six rows,

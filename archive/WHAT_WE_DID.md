@@ -82,6 +82,8 @@ The details are in `docs/ANALYTIC_PROOF.md`.
 of parameters. Two examples: O1 has about one million cells, and O2 has 84,156 cells in 14 rows. These certificates
 depend on neither the size nor the shape of the forest.
 - The O1 and O2 cells were replayed in full by independent code.
+- The O3 tail cells and the O4 atlas boxes were not replayed by independent code; they are checked only by the Lean
+  checkers.
 - Every family is checked in Lean by a checker whose soundness is proved.
 
 ## 4. Trust
@@ -96,7 +98,10 @@ possible in principle but expensive.
 
 ## 5. Who did what
 
-- **Yours.** The conditional binomial mixture and the finite-order theorem.
+- **Yours.** The conditional binomial mixture and the finite-order theorem. Also yours, in the numbering of your paper
+  with Wei Li (Zenodo, doi:10.5281/zenodo.22999166): the window lemma (Lemma 3.1, whose initial segment you credit to
+  Fang, Lu, Nevo, Yao and Zheng), the forms of the inputs and of the no-valley certificates ((44)–(46)), and the
+  variance identity and the competitor construction used for O2 ((86) and (95)).
 - **Done in Kevin Vallier's campaign, by AI agents under his direction:**
   - "Sol", an OpenAI Codex agent: O3–O6, the atlas, and the assembly of O2;
   - "Astra": O1;
@@ -104,8 +109,17 @@ possible in principle but expensive.
   - Claude agents (Anthropic): the Lean formalization, all the reviews and independent replays, and the certificates
     that closed O2's last two activity ranges.
 
-No human referee has checked the new argument yet. Every piece was independently recomputed and reviewed before it was
-adopted. The proof documents, certificates, checkers and review reports are available on request.
+No human referee has checked the new argument yet. Every check listed here was made by AI agents or by Lean:
+- The written proofs of O1, O2, O3, O5 and O6, of the theorem behind the atlas boxes and of the large-mean (Fourier)
+  theorem were reviewed by separate Claude review agents. The criterion of O4 (the no-valley lemma, called T1 in the
+  Lean) has no separate written review; its check is its complete Lean proof.
+- The O1 cells (about one million) and the O2 cells (84,156 in 14 rows) were replayed in full by independent code.
+- The O3 tail cells (150 band and tilt pairs) and the O4 atlas (1,717 rational dual boxes) were checked only by the Lean
+  checkers, with no independent replay. For the atlas, the review checked the box theorem, not each box.
+- The finite part (your 17,100 triples and 1,907 LP certificates) was re-verified by an independent exact checker, as
+  described in Section 1.
+
+The proof documents, certificates, checkers and review reports are available on request.
 
 ## 6. How to check it
 
